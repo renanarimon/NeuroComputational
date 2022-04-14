@@ -27,7 +27,7 @@ class Adaline:
         :param X:
         :return:
         """
-        wSum = np.dot(self._weight[1:], X) + self._weight[0]
+        wSum = np.dot(X, self._weight[1:]) # + self._weight[0]
         return wSum
 
     def activationSigmoid(self, wSum: np.ndarray) -> np.ndarray:
@@ -35,9 +35,13 @@ class Adaline:
         sigmoid function
         :return:
         """
-        return 1 / (1 + np.exp(-wSum))
+        return wSum
+        # try:
+        #     return 1 / (1 + np.exp(-wSum))
+        # except Exception as e:
+        #     e.__str__()
 
-    def fit(self, X, y):
+    def fit(self, X: np.ndarray, y: np.ndarray):
         """
         train the model - find the best weights to predict.
         error: target - output
@@ -62,7 +66,7 @@ class Adaline:
         :param X:
         :return:
         """
-        return np.where(self.activationSigmoid(self.weightedSum(X)) >= self.threshold, 1, 0)
+        return np.where(self.activationSigmoid(self.weightedSum(X)) >= self.threshold, 1, -1)
 
     def score(self, X, y):
         """
@@ -71,10 +75,12 @@ class Adaline:
         :param y:
         :return:
         """
-        countTrue = 0
+        countFalse = 0
         for xi, yi in zip(X, y):
-            if self.predict(xi) == yi:
-                countTrue += 1
-        return countTrue / len(y)
+            p = self.predict(xi)
+            # print(p)
+            if p != yi:
+                countFalse += 1
+        return (len(X) - countFalse) / len(X)
 
 
