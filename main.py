@@ -1,8 +1,7 @@
 import random
 import numpy as np
 
-import ada
-from Adaline_1 import Adaline_1
+from Adaline import Adaline
 
 def createDataSet(num: int) -> (np.ndarray, np.ndarray):
     dataSet = np.ndarray((num, 3))
@@ -20,7 +19,7 @@ if __name__ == '__main__':
     print("x_train: \n", X_train)
     print("y_train: \n", y_train)
     # a= ada.AdalineAlgo(0.01, 100)
-    a = Adaline_1(10, 0.01)
+    a = Adaline(10, 0.01)
     a.fit(X_train, y_train)
     pred = a.predict(X_train)
     print("pred: \n", pred)

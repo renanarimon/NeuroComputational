@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Adaline_1:
+class Adaline:
 
     def __init__(self, n_iter=100, learning_rate=0.01, random_state=42):
         self.n_iter = n_iter
