@@ -37,10 +37,10 @@ class Adaline:
         :param y:
         :return:
         """
-        bias = np.ones([X.shape[0],1]) # add bias column
+        bias = np.ones([X.shape[0], 1])  # add bias column
         np.append(X, bias, axis=1)
         self.random_weights(X)
-        for i in range(self.n_iter): #
+        for i in range(self.n_iter):
             for xi, target in zip(X, y):
                 output = self.net_input(xi)
                 error = target - output
