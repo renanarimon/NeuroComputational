@@ -31,6 +31,6 @@ def createData(size: int, part=1):
 
 
 if __name__ == '__main__':
-    data = createData(1000, 2)
+    data = createData(1000, 3)
     model = Kohonen(data, 100)
     model.train_SOM()

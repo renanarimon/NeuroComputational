@@ -6,20 +6,40 @@ from mpmath import rand
 
 class Kohonen:
     def __init__(self, data: np.ndarray, net_size: int):
+        """
+        SOM: self organization map - weight of each neuron
+        :param data: train_data
+        :param net_size:
+        """
         rand = np.random.RandomState(0)
         h = np.sqrt(net_size).astype(int)
-        print(h)
         self.SOM = rand.randint(0, 1000, (h, h, 2)).astype(float) / 1000
         self.data = data
 
-    def find_BMU(self, train_ex):
-        distSq = (np.square(self.SOM - train_ex)).sum(axis=2)
+    def find_BMU(self, sample):
+        """
+        find the most close neuron for this sample
+        clac the oclid distance from this sample to all neurons,
+        pick the neuron that minimize the dist
+        :param sample:
+        :return:
+        """
+        distSq = (np.square(self.SOM - sample)).sum(axis=2)
         return np.unravel_index(np.argmin(distSq, axis=None), distSq.shape)
 
     # Update the weights of the SOM cells when given a single training example
     # and the model parameters along with BMU coordinates as a tuple
     def update_weights(self, train_ex, learn_rate, radius_sq,
                        BMU_coord, step=3):
+        """
+        update weight of BMU and its neighboors
+        :param train_ex:
+        :param learn_rate:
+        :param radius_sq:
+        :param BMU_coord:
+        :param step:
+        :return:
+        """
         g, h = BMU_coord
         # if radius is close to zero then only BMU is changed
         if radius_sq < 1e-3:
