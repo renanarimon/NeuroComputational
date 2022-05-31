@@ -15,7 +15,8 @@ class Adaline:
         :param X:
         :return:
         """
-        return np.dot(X, self.w)
+        # return np.sum((X/100)*self.w)
+        return np.dot(X/100, self.w)
 
     def random_weights(self, X: np.ndarray):
         """
@@ -43,8 +44,9 @@ class Adaline:
         for i in range(self.n_iter):
             for xi, target in zip(X, y):
                 output = self.net_input(xi)
-                error = target - output
-                self.w += self.learning_rate * xi.dot(error)
+                error = (target - output)
+                self.w += self.learning_rate * (xi/100).dot(error)
+
 
     def predict(self, X: np.ndarray):
         """
