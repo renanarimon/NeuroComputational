@@ -1,4 +1,5 @@
 # Return the (g,h) index of the BMU in the grid
+import mpmath
 import numpy as np
 import matplotlib.pyplot as plt
 from mpmath import rand
@@ -15,6 +16,7 @@ class Kohonen:
         h = np.sqrt(net_size).astype(int)
         self.SOM = rand.randint(0, 1000, (h, h, 2)).astype(float) / 1000
         self.data = data
+        self.net_size = net_size
 
     def find_BMU(self, sample):
         """
@@ -55,7 +57,7 @@ class Kohonen:
 
     # Main routine for training an SOM. It requires an initialized SOM grid
     # or a partially trained grid as parameter
-    def train_SOM(self, learn_rate=.1, radius_sq=1,
+    def train_SOM(self, learn_rate=.9, radius_sq=1,
                   lr_decay=.1, radius_decay=.1, epochs=10):
         rand = np.random.RandomState(0)
         learn_rate_0 = learn_rate
@@ -66,22 +68,35 @@ class Kohonen:
                 g, h = self.find_BMU(train_ex)
                 self.SOM = self.update_weights(train_ex,
                                                learn_rate, radius_sq, (g, h))
+            self.plot("curr iter: " + str(epoch) + ", learning rate: " + str(round(learn_rate, 3)))
             # Update learning rate and radius
             learn_rate = learn_rate_0 * np.exp(-epoch * lr_decay)
             radius_sq = radius_0 * np.exp(-epoch * radius_decay)
-        self.plot()
         return self.SOM
 
-    def plot(self):
-        xs = []
-        ys = []
+    def plot(self, s):
+        re_wx = self.SOM[:, :, 0]
+        re_wy = self.SOM[:, :, 1]
+
+        fig, ax = plt.subplots()
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
         for i in range(self.SOM.shape[0]):
+            xs = []
+            ys = []
+            xh = []
+            yh = []
             for j in range(self.SOM.shape[1]):
                 xs.append(self.SOM[i, j, 0])
                 ys.append(self.SOM[i, j, 1])
+                xh.append(self.SOM[j, i, 0])
+                yh.append(self.SOM[j, i, 1])
 
-        plt.scatter(self.data[:, 0], self.data[:, 1])
-        plt.scatter([xs], [ys], c='r')
-        plt.plot(xs, ys, 'r')
+            ax.plot(xs, ys, 'r-', markersize=0, linewidth=0.7)
+            ax.plot(xh, yh, 'r-', markersize=0, linewidth=0.7)
 
+        ax.plot(re_wx, re_wy, color='b', marker='o', linewidth=0, markersize=3)
+        ax.scatter(self.data[:, 0], self.data[:, 1], c="b", alpha=0.2)
+        plt.title(s)
+        # plt.savefig(s + ".png")
         plt.show()
