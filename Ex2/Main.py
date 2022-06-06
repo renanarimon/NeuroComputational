@@ -3,6 +3,7 @@ from SOM import Kohonen
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn_som.som import SOM
+from SOM_1D import Kohonen_1D
 
 def createData(size: int, part=1):
     if part == 1:
@@ -102,9 +103,9 @@ if __name__ == '__main__':
     # data = createData(1000, 3)
     # model = Kohonen(data, 100)
     # model.train_SOM()
-    data = createData(1000, 1)
+    data = createDataB(1)
     # plt.scatter(data[:, 0], data[:, 1])
     # plt.show()
 
-    model = Kohonen(data, 30)
+    model = Kohonen_1D(data, 100)
     model.train_SOM()
