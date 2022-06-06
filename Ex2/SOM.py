@@ -1,8 +1,5 @@
-# Return the (g,h) index of the BMU in the grid
-import mpmath
 import numpy as np
 import matplotlib.pyplot as plt
-from mpmath import rand
 
 
 class Kohonen:
@@ -31,28 +28,28 @@ class Kohonen:
 
     # Update the weights of the SOM cells when given a single training example
     # and the model parameters along with BMU coordinates as a tuple
-    def update_weights(self, train_ex, learn_rate, radius_sq,
-                       BMU_coord, step=3):
+    def update_weights(self, sample, learn_rate, radius_sq,
+                       bmu_idx, step=3):
         """
         update weight of BMU and its neighboors
-        :param train_ex:
+        :param sample: single training example
         :param learn_rate:
         :param radius_sq:
-        :param BMU_coord:
+        :param bmu_idx: the best neuron
         :param step:
         :return:
         """
-        g, h = BMU_coord
+        x, y = bmu_idx
         # if radius is close to zero then only BMU is changed
         if radius_sq < 1e-3:
-            self.SOM[g, h, :] += learn_rate * (train_ex - self.SOM[g, h, :])
+            self.SOM[x, y, :] += learn_rate * (sample - self.SOM[x, y, :])
             return self.SOM
         # Change all cells in a small neighborhood of BMU
-        for i in range(max(0, g - step), min(self.SOM.shape[0], g + step)):
-            for j in range(max(0, h - step), min(self.SOM.shape[1], h + step)):
-                dist_sq = np.square(i - g) + np.square(j - h)
+        for i in range(max(0, x - step), min(self.SOM.shape[0], x + step)):
+            for j in range(max(0, y - step), min(self.SOM.shape[1], y + step)):
+                dist_sq = np.square(i - x) + np.square(j - y)
                 dist_func = np.exp(-dist_sq / 2 / radius_sq)
-                self.SOM[i, j, :] += learn_rate * dist_func * (train_ex - self.SOM[i, j, :])
+                self.SOM[i, j, :] += learn_rate * dist_func * (sample - self.SOM[i, j, :])
         return self.SOM
 
     # Main routine for training an SOM. It requires an initialized SOM grid
@@ -68,7 +65,7 @@ class Kohonen:
                 g, h = self.find_BMU(train_ex)
                 self.SOM = self.update_weights(train_ex,
                                                learn_rate, radius_sq, (g, h))
-            self.plot("curr iter: " + str(epoch) + ", learning rate: " + str(round(learn_rate, 3)))
+            self.plot("curr iter: " + str(epoch) + " , learning rate: " + str(round(learn_rate, 3)))
             # Update learning rate and radius
             learn_rate = learn_rate_0 * np.exp(-epoch * lr_decay)
             radius_sq = radius_0 * np.exp(-epoch * radius_decay)
@@ -96,7 +93,6 @@ class Kohonen:
             ax.plot(xh, yh, 'r-', markersize=0, linewidth=0.7)
 
         ax.plot(re_wx, re_wy, color='b', marker='o', linewidth=0, markersize=3)
-        ax.scatter(self.data[:, 0], self.data[:, 1], c="b", alpha=0.2)
+        ax.scatter(self.data[:, 0], self.data[:, 1], c="c", alpha=0.2)
         plt.title(s)
-        # plt.savefig(s + ".png")
         plt.show()
