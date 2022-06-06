@@ -7,7 +7,7 @@ class Kohonen:
         """
         SOM: self organization map - weight of each neuron
         :param data: train_data
-        :param net_size:
+        :param net_size: num of neurons
         """
         rand = np.random.RandomState(0)
         h = np.sqrt(net_size).astype(int)
@@ -20,16 +20,13 @@ class Kohonen:
         find the most close neuron for this sample
         clac the oclid distance from this sample to all neurons,
         pick the neuron that minimize the dist
-        :param sample:
+        :param sample: single training example
         :return:
         """
         distSq = (np.square(self.SOM - sample)).sum(axis=2)
         return np.unravel_index(np.argmin(distSq, axis=None), distSq.shape)
 
-    # Update the weights of the SOM cells when given a single training example
-    # and the model parameters along with BMU coordinates as a tuple
-    def update_weights(self, sample, learn_rate, radius_sq,
-                       bmu_idx, step=3):
+    def update_weights(self, sample, learn_rate, radius_sq, bmu_idx, step=3):
         """
         update weight of BMU and its neighboors
         :param sample: single training example
@@ -52,37 +49,46 @@ class Kohonen:
                 self.SOM[i, j, :] += learn_rate * dist_func * (sample - self.SOM[i, j, :])
         return self.SOM
 
-    # Main routine for training an SOM. It requires an initialized SOM grid
-    # or a partially trained grid as parameter
     def train_SOM(self, learn_rate=.9, radius_sq=1,
                   lr_decay=.1, radius_decay=.1, epochs=10):
+        """
+        train SOM model - for each sample:
+            1. find BMU
+            2. update weights
+            3. update learning rate
+            4. update radius
+        :param lr_decay: Rate of decay of the learn_rate
+        :param radius_decay: Rate of decay of the radius
+        :param epochs: num of iteration
+        :return:
+        """
         rand = np.random.RandomState(0)
         learn_rate_0 = learn_rate
         radius_0 = radius_sq
         for epoch in np.arange(0, epochs):
             rand.shuffle(self.data)
-            for train_ex in self.data:
-                g, h = self.find_BMU(train_ex)
-                self.SOM = self.update_weights(train_ex,
-                                               learn_rate, radius_sq, (g, h))
+            for sample in self.data:
+                x, y = self.find_BMU(sample)
+                self.SOM = self.update_weights(sample,
+                                               learn_rate, radius_sq, (x, y))
             self.plot("curr iter: " + str(epoch) + " , learning rate: " + str(round(learn_rate, 3)))
             # Update learning rate and radius
             learn_rate = learn_rate_0 * np.exp(-epoch * lr_decay)
             radius_sq = radius_0 * np.exp(-epoch * radius_decay)
         return self.SOM
 
-    def plot(self, s):
-        re_wx = self.SOM[:, :, 0]
-        re_wy = self.SOM[:, :, 1]
+    def plot(self, title):
+        X = self.SOM[:, :, 0]  # The X of each point
+        Y = self.SOM[:, :, 1]  # The Y of each point
 
         fig, ax = plt.subplots()
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
         for i in range(self.SOM.shape[0]):
-            xs = []
-            ys = []
-            xh = []
-            yh = []
+            xs = []  # x of each point in axis 1 (cols)
+            ys = []  # y of each point in axis 1 (rows)
+            xh = []  # x of each point in axis 0 (cols)
+            yh = []  # x of each point in axis 1 (rows)
             for j in range(self.SOM.shape[1]):
                 xs.append(self.SOM[i, j, 0])
                 ys.append(self.SOM[i, j, 1])
@@ -92,7 +98,7 @@ class Kohonen:
             ax.plot(xs, ys, 'r-', markersize=0, linewidth=0.7)
             ax.plot(xh, yh, 'r-', markersize=0, linewidth=0.7)
 
-        ax.plot(re_wx, re_wy, color='b', marker='o', linewidth=0, markersize=3)
+        ax.plot(X, Y, color='b', marker='o', linewidth=0, markersize=3)
         ax.scatter(self.data[:, 0], self.data[:, 1], c="c", alpha=0.2)
-        plt.title(s)
+        plt.title(title)
         plt.show()
