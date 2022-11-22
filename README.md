@@ -1,4 +1,4 @@
-# Neuro
+# NeuroComputational
 ## Adaline & Backpropagation
 Adaline is a single-layer artificial neural network. It consists of a weight, a 
 bias, and a summation function.
@@ -29,4 +29,6 @@ You can read more about SOM here: https://en.wikipedia.org/wiki/Self-organizing_
 ![image](https://user-images.githubusercontent.com/77155986/203386577-8b1e4ded-de8e-4c07-9f4f-3f46ba60c5fb.png)
 
 for more information and examples:
-1. 
+1. https://github.com/renanarimon/Neuro/blob/master/Ex1/neuro_AB.pdf
+2. https://github.com/renanarimon/Neuro/blob/master/Ex1/neuro_CD.pdf
+3. 
